@@ -1,0 +1,11 @@
+{:itonami.blueprint/id "cloud-itonami-7710"
+ :itonami.blueprint/name "Community Vehicle Rental Operations"
+ :itonami.blueprint/isic-rev5 "7710"
+ :itonami.blueprint/domain :commercial/vehicle-rental-services
+ :itonami.blueprint/license "AGPL-3.0-or-later"
+ :itonami.blueprint/social-impact [:road-safety :consumer-protection :shared-asset-access]
+ :itonami.blueprint/governor :vehicle-rental-governor
+ :itonami.blueprint/robotics true
+ :itonami.blueprint/required-technologies [:robotics :identity :forms :dmn :bpmn :audit-ledger :labor]
+ :itonami.blueprint/optional-technologies [:optimization]
+ :itonami.blueprint/status :public-oss}
