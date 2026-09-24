@@ -1,0 +1,44 @@
+;; What this vertical's robot physically does, declared for
+;; kotoba.robotics.process (kotoba-lang/robotics). `kbb -M:dev:physics` runs it.
+;;
+;; README "Robotics premise": robots do vehicle-condition inspection at
+;; pickup/return, damage documentation and fuel/mileage verification for a
+;; self-drive rental operator (ISIC 7710). Their physical work: an inspection
+;; rover drives across the lot from the return lane to the prep bay, an
+;; inspection arm reaches a camera / tread-depth head down to each wheel, and
+;; before the arm may touch a brake disc the disc has to cool down.
+;;
+;; Every number without a cited source is marked `estimate` in its :basis.
+;; Replacing an estimate with a sourced value is this bot's growth work.
+{:physics/schema "itonami.physical-ai.spec.v1"
+ :repo "cloud-itonami/cloud-itonami-isic-7710"
+ :cases
+ [{:id :return-lane-to-prep-bay
+   :kind :transport
+   :procedure "inspection rover drives with its sensor kit from the return lane to the vehicle's prep bay across the rental lot"
+   :params {:mass-kg 70.0 :payload-kg 12.0 :v-max-mps 1.5 :a-max-mps2 0.6
+            :brake-decel-mps2 1.0 :drive-force-n 250.0 :crr 0.02
+            :cog-height-m 0.50 :support-half-length-m 0.30 :slope-deg 2.0 :max-time-s 1800.0}
+   :sweep {:param :distance-m :values [30.0 60.0 100.0 150.0 220.0]}
+   :quantity :cycle-time-s
+   :limit {:max 120.0 :basis "estimate: rover must reach the returned car within 2 minutes so the condition check finishes while the customer is at the counter"}
+   :boundary {:lo 10.0 :hi 400.0}}
+  {:id :wheel-arch-inspection-reach
+   :kind :manipulator
+   :procedure "arm lowers the camera / tread-depth gauge head from its stowed pose to the wheel arch of the returned car"
+   :params {:l1-m 0.55 :l2-m 0.45 :m1-kg 5.0 :m2-kg 3.5
+            :from [0.30 0.60] :to [0.75 -0.20] :duration-s 2.0 :steps 400}
+   :sweep {:param :payload-kg :values [0.5 1.0 2.0 3.0 5.0]}
+   :quantity :peak-tau1-nm
+   :limit {:max 80.0 :basis "estimate: continuous shoulder torque of a mid-size collaborative arm (~10 kg payload class)"}
+   :boundary {:lo 0.1 :hi 30.0}}
+  {:id :brake-disc-cool-before-touch
+   :kind :thermal
+   :procedure "returned car's cast-iron brake disc cools in still air until its mid-plane is below 50 C, when the arm may touch it"
+   :params {:thickness-m 0.012 :conductivity-w-mk 50.0 :density-kg-m3 7200.0 :specific-heat-j-kgk 460.0
+            :t-hot-c 25.0 :h-front-w-m2k 30.0 :h-back-w-m2k 0.0 :t-back-ambient-c 25.0
+            :threshold-c 50.0 :threshold-direction :falling :duration-s 7200.0 :nodes 5}
+   :sweep {:param :t0-c :values [80.0 120.0 180.0 250.0 350.0]}
+   :quantity :time-to-threshold-s
+   :limit {:max 2700.0 :basis "estimate: a returned car should be inspection-ready within 45 minutes of drop-off; 24 mm disc modeled as half thickness with a symmetric mid-plane"}
+   :boundary {:lo 60.0 :hi 600.0}}]}
