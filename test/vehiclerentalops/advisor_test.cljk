@@ -1,6 +1,6 @@
 (ns vehiclerentalops.advisor-test
   "Unit tests of `vehiclerentalops.advisor` proposal generation."
-  (:require [clojure.test :refer [deftest is testing]]
+  (:require [kotoba.test :refer [deftest is testing]]
             [vehiclerentalops.advisor :as adv]
             [vehiclerentalops.store :as store]))
 
